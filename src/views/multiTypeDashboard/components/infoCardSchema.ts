@@ -1,9 +1,9 @@
-interface Title{
+interface Title {
   text: string | number
   tips?: string
 }
 
-interface Link{
+interface Link {
   text: string | number
   action?: () => unknown
 }

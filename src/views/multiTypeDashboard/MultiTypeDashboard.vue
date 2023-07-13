@@ -7,6 +7,26 @@
         :schema="assignmentCard"
       />
     </div>
+    <div v-loading="loadingAssignmentCards" class="progress-cards-wrapper">
+      <div class="merged-card-wrapper">
+        <card-with-progress
+          :style="cardWithProgressSchema1.style"
+          :info-card-schema="cardWithProgressSchema1.infoCardSchema"
+          :progress-schema="cardWithProgressSchema1.progressSchema"
+        />
+        <card-with-progress
+          :style="cardWithProgressSchema2.style"
+          :info-card-schema="cardWithProgressSchema2.infoCardSchema"
+          :progress-schema="cardWithProgressSchema2.progressSchema"
+        />
+      </div>
+      <card-with-progress
+        class="card-wrapper"
+        :style="cardWithProgressSchema3.style"
+        :info-card-schema="cardWithProgressSchema3.infoCardSchema"
+        :progress-schema="cardWithProgressSchema3.progressSchema"
+      />
+    </div>
   </div>
 </template>
 
@@ -21,6 +41,7 @@ import {
   DashboardSchema,
   PageTypes,
 } from './useMultiTypeDashboardSchema';
+import CardWithProgress from './components/CardWithProgress.vue';
 
 const route = useRoute();
 
@@ -40,6 +61,9 @@ let {
   loadOverallData,
   loadingAssignmentCards,
   assignmentCards,
+  cardWithProgressSchema1,
+  cardWithProgressSchema2,
+  cardWithProgressSchema3,
 } = getMultiTypeDashboardSchema();
 
 watch(
@@ -49,6 +73,9 @@ watch(
       loadOverallData,
       loadingAssignmentCards,
       assignmentCards,
+      cardWithProgressSchema1,
+      cardWithProgressSchema2,
+      cardWithProgressSchema3,
     } = getMultiTypeDashboardSchema());
     loadOverallData();
   },
@@ -61,6 +88,7 @@ watch(
 <style lang="less" scoped>
 .page-wrapper {
   padding: 0 24px;
+  text-align: left;
 
   @card-item-gap: 16px;
   @card-item-count-per-row: 3;
@@ -78,6 +106,21 @@ watch(
     margin: 16px 0 24px 0;
 
     & > * {
+      max-width: @card-item-max-width;
+    }
+  }
+  .progress-cards-wrapper {
+    .merged-card-wrapper {
+      display: flex;
+      border: 1px solid #E2E6EC;
+      border-radius: 4px;
+      padding: 16px 0;
+    }
+
+    .card-wrapper {
+      border: 1px solid #E2E6EC;
+      border-radius: 4px;
+      padding: 16px;
       max-width: @card-item-max-width;
     }
   }

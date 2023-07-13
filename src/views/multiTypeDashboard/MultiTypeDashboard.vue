@@ -2,7 +2,7 @@
   <div class="page-wrapper">
     <div v-loading="loadingAssignmentCards" class="assignment-cards-wrapper">
       <info-card
-        v-for="(assignmentCard, index) in multiTypeDashboardSchema.assignmentCards"
+        v-for="(assignmentCard, index) in assignmentCards"
         :key="index"
         :schema="assignmentCard"
       />
@@ -11,9 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  ref, watch, computed,
-} from 'vue';
+import { watch } from 'vue';
 import { useRoute } from 'vue-router';
 import InfoCard from './components/InfoCard.vue';
 import {
@@ -38,15 +36,21 @@ const getMultiTypeDashboardSchema = () => {
   return schemaMap[dashboardType as PageTypes]();
 };
 
-const multiTypeDashboardSchema = ref(getMultiTypeDashboardSchema());
-
-const loadingAssignmentCards = computed(() => multiTypeDashboardSchema.value.loadingAssignmentCards || false);
+let {
+  loadOverallData,
+  loadingAssignmentCards,
+  assignmentCards,
+} = getMultiTypeDashboardSchema();
 
 watch(
   () => route.params,
   () => {
-    multiTypeDashboardSchema.value = getMultiTypeDashboardSchema();
-    multiTypeDashboardSchema.value.loadOverallData();
+    ({
+      loadOverallData,
+      loadingAssignmentCards,
+      assignmentCards,
+    } = getMultiTypeDashboardSchema());
+    loadOverallData();
   },
   {
     immediate: true,

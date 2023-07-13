@@ -33,6 +33,7 @@
 <script lang="ts" setup>
 import { watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { ElMessage } from 'element-plus';
 import InfoCard from './components/InfoCard.vue';
 import {
   getStationDashboardSchema,
@@ -68,7 +69,7 @@ let {
 
 watch(
   () => route.params,
-  () => {
+  async () => {
     ({
       loadOverallData,
       loadingAssignmentCards,
@@ -77,7 +78,8 @@ watch(
       cardWithProgressSchema2,
       cardWithProgressSchema3,
     } = getMultiTypeDashboardSchema());
-    loadOverallData();
+    await loadOverallData();
+    ElMessage('数据加载完毕'); // 应在 retryable 结束后执行
   },
   {
     immediate: true,

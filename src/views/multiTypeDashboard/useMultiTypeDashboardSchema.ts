@@ -1,9 +1,11 @@
 import {
   ComputedRef, Ref, computed, ref,
 } from 'vue';
+import { ElMessage } from 'element-plus';
 import { displayLocaleNumber } from './utils';
 import { InfoCardSchema } from './components/infoCardSchema';
 import { ProgressSchema } from './components/cardWithProgressSchema';
+import retryable from './requestRetry';
 
 export type PageTypes = 'admin' | 'station' | 'agency';
 
@@ -118,34 +120,43 @@ export const getAdminDashboardSchema = (): DashboardSchema => {
   const loadingAssignmentCards = ref(false);
 
   const loadOverallData = async () => {
-    loadingAssignmentCards.value = true;
-    await new Promise((resolve) => {
-      setTimeout(resolve, 1000);
-    });
-    overallData.value = {
-      value1: 1231,
-      value2: 1232,
-      value3: 1233,
-      value4: 1234,
-      value5: 1235,
-      value6: 1236,
-      value7: 1237,
-      value8: 1238,
-      value9: 1239,
-      value10: 1240,
-      value11: 1241,
-      value12: 1242,
-      percentValue1: 1231,
-      percentValue2: 1232,
-      percentValue3: 1233,
-      percent1: 10,
-      percent2: 100,
-      percent3: 20,
-      percent4: 0,
-      percent5: 0,
-      percent6: 30,
+    const action = async () => {
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (Math.random() < 0.5) resolve(null);
+          else reject(new Error('load failed'));
+        }, 1000);
+      });
+      overallData.value = {
+        value1: 1231,
+        value2: 1232,
+        value3: 1233,
+        value4: 1234,
+        value5: 1235,
+        value6: 1236,
+        value7: 1237,
+        value8: 1238,
+        value9: 1239,
+        value10: 1240,
+        value11: 1241,
+        value12: 1242,
+        percentValue1: 1231,
+        percentValue2: 1232,
+        percentValue3: 1233,
+        percent1: 10,
+        percent2: 100,
+        percent3: 20,
+        percent4: 0,
+        percent5: 0,
+        percent6: 30,
+      };
     };
-    loadingAssignmentCards.value = false;
+    await retryable(action, {
+      errorMsg: 'loadOverallData error',
+      customErrorHandler: (e: unknown) => { ElMessage('加载失败'); console.error('loadOverallData error', e); },
+      beforeRequest: () => { loadingAssignmentCards.value = true; },
+      afterRequest: () => { loadingAssignmentCards.value = false; },
+    });
   };
 
   const card1: ComputedRef<InfoCardSchema> = computed(() => ({
@@ -327,34 +338,43 @@ export const getStationDashboardSchema = (): DashboardSchema => {
   const loadingAssignmentCards = ref(false);
 
   const loadOverallData = async () => {
-    loadingAssignmentCards.value = true;
-    await new Promise((resolve) => {
-      setTimeout(resolve, 1000);
-    });
-    overallData.value = {
-      value1: 1241,
-      value2: 1242,
-      value3: 1243,
-      value4: 1244,
-      value5: 1245,
-      value6: 1246,
-      value7: 1247,
-      value8: 1248,
-      value9: 1249,
-      value10: 1250,
-      value11: 1251,
-      value12: 1252,
-      percentValue1: 1241,
-      percentValue2: 1242,
-      percentValue3: 1243,
-      percent1: 11,
-      percent2: 101,
-      percent3: 21,
-      percent4: 0,
-      percent5: 0,
-      percent6: 31,
+    const action = async () => {
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (Math.random() < 0.5) resolve(null);
+          else reject(new Error('load failed'));
+        }, 1000);
+      });
+      overallData.value = {
+        value1: 1241,
+        value2: 1242,
+        value3: 1243,
+        value4: 1244,
+        value5: 1245,
+        value6: 1246,
+        value7: 1247,
+        value8: 1248,
+        value9: 1249,
+        value10: 1250,
+        value11: 1251,
+        value12: 1252,
+        percentValue1: 1241,
+        percentValue2: 1242,
+        percentValue3: 1243,
+        percent1: 11,
+        percent2: 101,
+        percent3: 21,
+        percent4: 0,
+        percent5: 0,
+        percent6: 31,
+      };
     };
-    loadingAssignmentCards.value = false;
+    await retryable(action, {
+      errorMsg: 'loadOverallData error',
+      customErrorHandler: (e: unknown) => { ElMessage('加载失败'); console.error('loadOverallData error', e); },
+      beforeRequest: () => { loadingAssignmentCards.value = true; },
+      afterRequest: () => { loadingAssignmentCards.value = false; },
+    });
   };
 
   const card1: ComputedRef<InfoCardSchema> = computed(() => ({
@@ -550,30 +570,39 @@ export const getAgencyDashboardSchema = (): DashboardSchema => {
   const loadingAssignmentCards = ref(false);
 
   const loadOverallData = async () => {
-    loadingAssignmentCards.value = true;
-    await new Promise((resolve) => {
-      setTimeout(resolve, 1000);
-    });
-    overallData.value = {
-      value5: 1255,
-      value6: 1256,
-      value7: 1257,
-      value8: 1258,
-      value9: 1259,
-      value10: 1260,
-      value11: 1261,
-      value12: 1262,
-      percentValue1: 1251,
-      percentValue2: 1252,
-      percentValue3: 1253,
-      percent1: 12,
-      percent2: 102,
-      percent3: 22,
-      percent4: 0,
-      percent5: 0,
-      percent6: 32,
+    const action = async () => {
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (Math.random() < 0.5) resolve(null);
+          else reject(new Error('load failed'));
+        }, 1000);
+      });
+      overallData.value = {
+        value5: 1255,
+        value6: 1256,
+        value7: 1257,
+        value8: 1258,
+        value9: 1259,
+        value10: 1260,
+        value11: 1261,
+        value12: 1262,
+        percentValue1: 1251,
+        percentValue2: 1252,
+        percentValue3: 1253,
+        percent1: 12,
+        percent2: 102,
+        percent3: 22,
+        percent4: 0,
+        percent5: 0,
+        percent6: 32,
+      };
     };
-    loadingAssignmentCards.value = false;
+    await retryable(action, {
+      errorMsg: 'loadOverallData error',
+      customErrorHandler: (e: unknown) => { ElMessage('加载失败'); console.error('loadOverallData error', e); },
+      beforeRequest: () => { loadingAssignmentCards.value = true; },
+      afterRequest: () => { loadingAssignmentCards.value = false; },
+    });
   };
 
   const card3: ComputedRef<InfoCardSchema> = computed(() => ({

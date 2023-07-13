@@ -39,7 +39,6 @@ const props = defineProps({
 const titleText = computed(() => props.schema.value.title?.text || '');
 const tipsText = computed(() => props.schema.value.title?.tips || '');
 const linkText = computed(() => props.schema.value.link?.text || '');
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 const linkAction = computed(() => props.schema.value.link?.action || (() => {}));
 const descriptionNumber = computed(() => {
   const value = props.schema.value.description?.number?.value;

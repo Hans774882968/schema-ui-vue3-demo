@@ -7,6 +7,7 @@
         :schema="assignmentCard"
       />
     </div>
+
     <div v-loading="loadingAssignmentCards" class="progress-cards-wrapper">
       <div class="merged-card-wrapper">
         <card-with-progress
@@ -27,13 +28,23 @@
         :progress-schema="cardWithProgressSchema3.progressSchema"
       />
     </div>
+
+    <div>
+      <vue3-pro-table ref="detailTable" v-bind="detailTableProps">
+        <template v-if="typeof onClickView === 'function'" #operate="scope">
+          <el-button type="text" @click="onClickView(scope.row)">View</el-button>
+        </template>
+      </vue3-pro-table>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { watch } from 'vue';
+import {
+  nextTick, onBeforeMount, ref, watch,
+} from 'vue';
 import { useRoute } from 'vue-router';
-import { ElMessage } from 'element-plus';
+import Vue3ProTable from '@/components/Vue3ProTable/Vue3ProTable.vue';
 import InfoCard from './components/InfoCard.vue';
 import {
   getStationDashboardSchema,
@@ -65,7 +76,33 @@ let {
   cardWithProgressSchema1,
   cardWithProgressSchema2,
   cardWithProgressSchema3,
+  detailTableProps,
+  onClickView,
 } = getMultiTypeDashboardSchema();
+
+const detailTable = ref(null);
+
+type loadTypes = 'init' | 'routeChange' | 'autoRefresh';
+
+const loadWholePage = ({ loadType }: {loadType: loadTypes}) => {
+  loadOverallData();
+  if (loadType === 'init') {
+    nextTick(() => {
+      detailTable.value && (detailTable.value as any).refresh();
+    });
+    return;
+  }
+  if (loadType === 'routeChange') {
+    // 踩坑：修改 schema 后， refresh, handleReset 等方法都必须等到下一次渲染再执行，这样才能拿到最新的 props，才不会出现陈旧值问题
+    nextTick(() => {
+      detailTable.value && (detailTable.value as any).handleReset();
+    });
+  }
+};
+
+onBeforeMount(() => {
+  loadWholePage({ loadType: 'init' });
+});
 
 watch(
   () => route.params,
@@ -77,12 +114,11 @@ watch(
       cardWithProgressSchema1,
       cardWithProgressSchema2,
       cardWithProgressSchema3,
+      detailTableProps,
+      onClickView,
     } = getMultiTypeDashboardSchema());
-    await loadOverallData();
-    ElMessage('数据加载完毕'); // 应在 retryable 结束后执行
-  },
-  {
-    immediate: true,
+    loadOverallData();
+    loadWholePage({ loadType: 'routeChange' });
   },
 );
 </script>

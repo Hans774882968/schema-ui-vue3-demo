@@ -2,6 +2,21 @@ import {
   ComputedRef, Ref, computed, ref,
 } from 'vue';
 import { ElMessage } from 'element-plus';
+import {
+  loadAdminDetailData,
+  loadAdminOverallData,
+  loadAgencyOverallData,
+  loadStationOverallData,
+  AdminDetailParams,
+  AdminDetailResp,
+  loadStationDetailData,
+  StationDetailParams,
+  StationDetailResp,
+  AgencyDetailParams,
+  AgencyDetailResp,
+  loadAgencyDetailData,
+} from '@/api/multiTypeDashboard';
+import { Vue3ProTable } from '@/components/Vue3ProTable/interface';
 import { displayLocaleNumber } from './utils';
 import { InfoCardSchema } from './components/infoCardSchema';
 import { ProgressSchema } from './components/cardWithProgressSchema';
@@ -91,6 +106,8 @@ export interface DashboardSchema {
   cardWithProgressSchema1: CardWithProgressSchema
   cardWithProgressSchema2: CardWithProgressSchema
   cardWithProgressSchema3: CardWithProgressSchema
+  detailTableProps: Vue3ProTable
+  onClickView?: (row: any) => unknown
 }
 
 export const getAdminDashboardSchema = (): DashboardSchema => {
@@ -121,39 +138,11 @@ export const getAdminDashboardSchema = (): DashboardSchema => {
 
   const loadOverallData = async () => {
     const action = async () => {
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          if (Math.random() < 0.5) resolve(null);
-          else reject(new Error('load failed'));
-        }, 1000);
-      });
-      overallData.value = {
-        value1: 1231,
-        value2: 1232,
-        value3: 1233,
-        value4: 1234,
-        value5: 1235,
-        value6: 1236,
-        value7: 1237,
-        value8: 1238,
-        value9: 1239,
-        value10: 1240,
-        value11: 1241,
-        value12: 1242,
-        percentValue1: 1231,
-        percentValue2: 1232,
-        percentValue3: 1233,
-        percent1: 10,
-        percent2: 100,
-        percent3: 20,
-        percent4: 0,
-        percent5: 0,
-        percent6: 30,
-      };
+      overallData.value = await loadAdminOverallData();
     };
     await retryable(action, {
       errorMsg: 'loadOverallData error',
-      customErrorHandler: (e: unknown) => { ElMessage('加载失败'); console.error('loadOverallData error', e); },
+      customErrorHandler: (e: unknown) => { ElMessage('admin overall加载失败'); console.error('loadOverallData error', e); },
       beforeRequest: () => { loadingAssignmentCards.value = true; },
       afterRequest: () => { loadingAssignmentCards.value = false; },
     });
@@ -278,6 +267,57 @@ export const getAdminDashboardSchema = (): DashboardSchema => {
     ],
   }));
 
+  const detailTableProps = {
+    search: {
+      fields: [
+        {
+          type: 'text',
+          label: 'admin字段1',
+          name: 'field1',
+        },
+        {
+          type: 'text',
+          label: 'admin字段2',
+          name: 'field2',
+        },
+        {
+          type: 'text',
+          label: 'admin字段3',
+          name: 'field3',
+        },
+        {
+          type: 'text',
+          label: 'admin字段4',
+          name: 'field4',
+        },
+      ],
+    },
+    columns: [
+      { label: 'admin字段1', prop: 'field1' },
+      { label: 'admin字段2', prop: 'field2' },
+      { label: 'admin字段3', prop: 'field3' },
+      { label: 'admin字段4', prop: 'field4' },
+    ],
+    request: async (params: AdminDetailParams) => {
+      console.log('admin params', params); // dbg
+      let res = { list: [] as AdminDetailResp, total: 0 };
+      const action = async () => {
+        const { data } = await loadAdminDetailData(params);
+        res = { list: data.list, total: data.total };
+      };
+      await retryable(action, {
+        customErrorHandler: (e: unknown) => { ElMessage('admin detail加载失败'); console.error('loadAdminDetailData error', e); },
+      });
+      return {
+        data: res.list,
+        total: res.total,
+      };
+    },
+    pagination: {
+      pageSizes: [10, 24, 40, 50, 100],
+    },
+  };
+
   return {
     overallData,
     loadOverallData,
@@ -308,6 +348,7 @@ export const getAdminDashboardSchema = (): DashboardSchema => {
       infoCardSchema: card6,
       progressSchema: progressSchema3,
     },
+    detailTableProps,
   };
 };
 
@@ -339,39 +380,11 @@ export const getStationDashboardSchema = (): DashboardSchema => {
 
   const loadOverallData = async () => {
     const action = async () => {
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          if (Math.random() < 0.5) resolve(null);
-          else reject(new Error('load failed'));
-        }, 1000);
-      });
-      overallData.value = {
-        value1: 1241,
-        value2: 1242,
-        value3: 1243,
-        value4: 1244,
-        value5: 1245,
-        value6: 1246,
-        value7: 1247,
-        value8: 1248,
-        value9: 1249,
-        value10: 1250,
-        value11: 1251,
-        value12: 1252,
-        percentValue1: 1241,
-        percentValue2: 1242,
-        percentValue3: 1243,
-        percent1: 11,
-        percent2: 101,
-        percent3: 21,
-        percent4: 0,
-        percent5: 0,
-        percent6: 31,
-      };
+      overallData.value = await loadStationOverallData();
     };
     await retryable(action, {
       errorMsg: 'loadOverallData error',
-      customErrorHandler: (e: unknown) => { ElMessage('加载失败'); console.error('loadOverallData error', e); },
+      customErrorHandler: (e: unknown) => { ElMessage('station overall加载失败'); console.error('loadOverallData error', e); },
       beforeRequest: () => { loadingAssignmentCards.value = true; },
       afterRequest: () => { loadingAssignmentCards.value = false; },
     });
@@ -385,7 +398,7 @@ export const getStationDashboardSchema = (): DashboardSchema => {
     link: {
       text: 'station card1 link',
       action: () => {
-        console.info('station card1');
+        ElMessage('station card1');
       },
     },
     description: {
@@ -403,7 +416,7 @@ export const getStationDashboardSchema = (): DashboardSchema => {
     link: {
       text: 'station card2 link',
       action: () => {
-        console.info('station card2');
+        ElMessage('station card2');
       },
     },
     description: {
@@ -421,7 +434,7 @@ export const getStationDashboardSchema = (): DashboardSchema => {
     link: {
       text: 'station card3 link',
       action: () => {
-        console.info('station card3');
+        ElMessage('station card3');
       },
     },
     description: {
@@ -514,6 +527,57 @@ export const getStationDashboardSchema = (): DashboardSchema => {
     ],
   }));
 
+  const detailTableProps = {
+    search: {
+      fields: [
+        {
+          type: 'text',
+          label: 'station字段1',
+          name: 'field1',
+        },
+        {
+          type: 'text',
+          label: 'station字段2',
+          name: 'field2',
+        },
+        {
+          type: 'text',
+          label: 'station字段5',
+          name: 'field5',
+        },
+        {
+          type: 'text',
+          label: 'station字段6',
+          name: 'field6',
+        },
+      ],
+    },
+    columns: [
+      { label: 'station字段1', prop: 'field1' },
+      { label: 'station字段2', prop: 'field2' },
+      { label: 'station字段5', prop: 'field5' },
+      { label: 'station字段6', prop: 'field6' },
+    ],
+    request: async (params: StationDetailParams) => {
+      console.log('station params', params); // dbg
+      let res = { list: [] as StationDetailResp, total: 0 };
+      const action = async () => {
+        const { data } = await loadStationDetailData(params);
+        res = { list: data.list, total: data.total };
+      };
+      await retryable(action, {
+        customErrorHandler: (e: unknown) => { ElMessage('station detail加载失败'); console.error('loadStationDetailData error', e); },
+      });
+      return {
+        data: res.list,
+        total: res.total,
+      };
+    },
+    pagination: {
+      pageSizes: [10, 24, 40, 50, 100],
+    },
+  };
+
   return {
     overallData,
     loadOverallData,
@@ -544,6 +608,7 @@ export const getStationDashboardSchema = (): DashboardSchema => {
       infoCardSchema: card6,
       progressSchema: progressSchema3,
     },
+    detailTableProps,
   };
 };
 
@@ -571,35 +636,11 @@ export const getAgencyDashboardSchema = (): DashboardSchema => {
 
   const loadOverallData = async () => {
     const action = async () => {
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          if (Math.random() < 0.5) resolve(null);
-          else reject(new Error('load failed'));
-        }, 1000);
-      });
-      overallData.value = {
-        value5: 1255,
-        value6: 1256,
-        value7: 1257,
-        value8: 1258,
-        value9: 1259,
-        value10: 1260,
-        value11: 1261,
-        value12: 1262,
-        percentValue1: 1251,
-        percentValue2: 1252,
-        percentValue3: 1253,
-        percent1: 12,
-        percent2: 102,
-        percent3: 22,
-        percent4: 0,
-        percent5: 0,
-        percent6: 32,
-      };
+      overallData.value = await loadAgencyOverallData();
     };
     await retryable(action, {
       errorMsg: 'loadOverallData error',
-      customErrorHandler: (e: unknown) => { ElMessage('加载失败'); console.error('loadOverallData error', e); },
+      customErrorHandler: (e: unknown) => { ElMessage('agency overall加载失败'); console.error('loadOverallData error', e); },
       beforeRequest: () => { loadingAssignmentCards.value = true; },
       afterRequest: () => { loadingAssignmentCards.value = false; },
     });
@@ -613,7 +654,7 @@ export const getAgencyDashboardSchema = (): DashboardSchema => {
     link: {
       text: 'agency card3 link',
       action: () => {
-        console.info('agency card3');
+        ElMessage('agency card3');
       },
     },
     description: {
@@ -706,6 +747,72 @@ export const getAgencyDashboardSchema = (): DashboardSchema => {
     ],
   }));
 
+  const detailTableProps = {
+    search: {
+      fields: [
+        {
+          type: 'text',
+          label: 'agency字段3',
+          name: 'field3',
+        },
+        {
+          type: 'text',
+          label: 'agency字段4',
+          name: 'field4',
+        },
+        {
+          type: 'text',
+          label: 'agency字段5',
+          name: 'field5',
+        },
+        {
+          type: 'text',
+          label: 'agency字段6',
+          name: 'field6',
+        },
+      ],
+    },
+    columns: [
+      { label: 'agency字段3', prop: 'field3' },
+      { label: 'agency字段4', prop: 'field4' },
+      { label: 'agency字段5', prop: 'field5' },
+      { label: 'agency字段6', prop: 'field6' },
+      {
+        label: '操作',
+        fixed: 'right',
+        width: 180,
+        tdSlot: 'operate', // 自定义单元格内容的插槽名称
+      },
+    ],
+    request: async (params: AgencyDetailParams) => {
+      console.log('agency params', params); // dbg
+      let res = { list: [] as AgencyDetailResp, total: 0 };
+      const action = async () => {
+        const { data } = await loadAgencyDetailData(params);
+        res = { list: data.list, total: data.total };
+      };
+      await retryable(action, {
+        customErrorHandler: (e: unknown) => { ElMessage('agency detail加载失败'); console.error('loadAgencyDetailData error', e); },
+      });
+      return {
+        data: res.list,
+        total: res.total,
+      };
+    },
+    pagination: {
+      pageSizes: [10, 24, 40, 50, 100],
+    },
+  };
+  interface AgencyTableItem {
+    field3: string
+    field4: string
+    field5: string
+    field6: string
+  }
+  const onClickView = (row: AgencyTableItem) => {
+    ElMessage(`模拟查看${row.field3}详情`);
+  };
+
   return {
     overallData,
     loadOverallData,
@@ -734,5 +841,7 @@ export const getAgencyDashboardSchema = (): DashboardSchema => {
       infoCardSchema: card6,
       progressSchema: progressSchema3,
     },
+    detailTableProps,
+    onClickView,
   };
 };

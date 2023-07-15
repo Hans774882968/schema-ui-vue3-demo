@@ -1,4 +1,4 @@
-[toc]
+[TOC]
 
 # schema-ui-vue3-demo
 
@@ -48,7 +48,15 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 1. 放弃复用，直接复制粘贴UI代码到两个不同文件，逻辑单独修改。
 2. 坚持复用，让UI充满if else。
 
-是否存在一种方案处于两者之间？答案是肯定的。我们**约定**使用一个JS对象来描述UI结构，这个JS对象称为schema。
+本文juejin：https://juejin.cn/post/7255855848835727397
+
+本文CSDN：https://blog.csdn.net/hans774882968/article/details/131743408
+
+本文52pojie：https://www.52pojie.cn/thread-1808943-1-1.html
+
+**作者：[hans774882968](https://blog.csdn.net/hans774882968)以及[hans774882968](https://juejin.cn/user/1464964842528888)以及[hans774882968](https://www.52pojie.cn/home.php?mod=space&uid=1906177)**
+
+是否存在一种方案处于两者之间？答案是肯定的。我们首先**约定**使用一个JS对象来描述UI结构，这个JS对象称为UI schema。
 
 比如对于下图：
 
@@ -94,7 +102,9 @@ export interface InfoCardSchema {
 
 还有更复杂的场景，比如大厂B端的列表页，基本上早就完成了schema化的封装。
 
-上文我给“约定”加粗，是为了强调schema本质上是一个为了完成业务需求而创造的**应用层协议**。因此schema的优缺点就是“协议”的优缺点：
+然后让每种场景各返回一个schema，供组件解析。在此每种场景都可以视为一个hook。
+
+上文我给“约定”加粗，是为了强调UI schema本质上是一个为了完成业务需求而创造的**应用层协议**。因此schema的优缺点就是“协议”的优缺点：
 
 优点：
 1. 在实现代码复用的同时，保持了应对业务需求变化的能力。
@@ -220,8 +230,106 @@ export interface ProgressSchema {
 
 然后，我们主要需要完成：
 
-1. 完成解析schema的UI代码，即`src/views/multiTypeDashboard/MultiTypeDashboard.vue`。
-2. 对于每种类型的看板，都写一个hook函数，其返回值的类型就是上面约定的schema。hook函数的复用程度可以自由控制，甚至可以由不同的前端同学完成，只要符合协议即可。为了方便，我直接都在`src/views/multiTypeDashboard/useMultiTypeDashboardSchema.ts`实现了。
+1. 完成解析schema的UI组件，即让UI代码消费schema。代码：`src/views/multiTypeDashboard/MultiTypeDashboard.vue`。
+2. 对于每种类型的看板，都写一个hook函数，其返回值的类型就是上面约定的schema。hook函数的复用程度可以自由控制，甚至可以由不同的前端同学完成，只要符合协议即可。为了方便，我没有进行拆分，直接都在`src/views/multiTypeDashboard/useMultiTypeDashboardSchema.ts`实现了。
+
+解析schema的代码示例：
+
+```vue
+    <div v-loading="loadingAssignmentCards" class="progress-cards-wrapper">
+      <div class="merged-card-wrapper">
+        <card-with-progress
+          :style="cardWithProgressSchema1.style"
+          :info-card-schema="cardWithProgressSchema1.infoCardSchema"
+          :progress-schema="cardWithProgressSchema1.progressSchema"
+        />
+        <card-with-progress
+          :style="cardWithProgressSchema2.style"
+          :info-card-schema="cardWithProgressSchema2.infoCardSchema"
+          :progress-schema="cardWithProgressSchema2.progressSchema"
+        />
+      </div>
+      <card-with-progress
+        class="card-wrapper"
+        :style="cardWithProgressSchema3.style"
+        :info-card-schema="cardWithProgressSchema3.infoCardSchema"
+        :progress-schema="cardWithProgressSchema3.progressSchema"
+      />
+    </div>
+
+<script lang="ts" setup>
+// getMultiTypeDashboardSchema() 通过 route.params.dashboardType 获取对应的schema
+const getMultiTypeDashboardSchema = () => {
+  const schemaMap: Record<PageTypes, () => DashboardSchema> = {
+    admin: getAdminDashboardSchema,
+    agency: getAgencyDashboardSchema,
+    station: getStationDashboardSchema,
+  };
+
+  const { dashboardType } = route.params;
+  if (typeof dashboardType !== 'string' || !(dashboardType in schemaMap)) return schemaMap.admin();
+  return schemaMap[dashboardType as PageTypes]();
+};
+    
+let {
+  loadingAssignmentCards,
+  cardWithProgressSchema1,
+  cardWithProgressSchema2,
+  cardWithProgressSchema3,
+} = getMultiTypeDashboardSchema();
+</script>
+```
+
+hook示例：
+
+```ts
+export interface DashboardSchema {
+  overallData: Ref<AdminOverallData | StationOverallData | AgencyOverallData>
+  loadOverallData: () => void
+  loadingAssignmentCards?: Ref<boolean>
+  assignmentCards: Array<ComputedRef<InfoCardSchema>>
+  cardWithProgressSchema1: CardWithProgressSchema
+  cardWithProgressSchema2: CardWithProgressSchema
+  cardWithProgressSchema3: CardWithProgressSchema
+  detailTableProps: Vue3ProTable
+  onClickView?: (row: any) => unknown
+}
+
+export const getAdminDashboardSchema = (): DashboardSchema => {
+  return {
+    assignmentCards: [
+      card1,
+      card2,
+      card3,
+    ],
+    cardWithProgressSchema1: {
+      infoCardSchema: card4,
+      progressSchema: progressSchema1,
+      style: {
+        borderRight: '1px solid #E2E6EC',
+        flex: '1',
+        padding: '0 16px',
+      },
+    },
+    cardWithProgressSchema2: {
+      infoCardSchema: card5,
+      progressSchema: progressSchema2,
+      style: {
+        flex: '1',
+        padding: '0 16px',
+      },
+    },
+    cardWithProgressSchema3: {
+      infoCardSchema: card6,
+      progressSchema: progressSchema3,
+    },
+    detailTableProps,
+    loadOverallData,
+    loadingAssignmentCards,
+    overallData,
+  };
+};
+```
 
 从代码量来看，解析schema的UI编写难度是比正常写法要高不少的，并且schema协议肯定是需要在开发过程中反复调整的。
 
@@ -251,6 +359,8 @@ let {
   cardWithProgressSchema1,
   cardWithProgressSchema2,
   cardWithProgressSchema3,
+  detailTableProps,
+  onClickView,
 } = getMultiTypeDashboardSchema();
 
 watch(
@@ -264,6 +374,8 @@ watch(
       cardWithProgressSchema1,
       cardWithProgressSchema2,
       cardWithProgressSchema3,
+      detailTableProps,
+      onClickView,
     } = getMultiTypeDashboardSchema());
     await loadOverallData(); // 重新加载数据
     // 加载数据后的操作
@@ -277,7 +389,7 @@ watch(
 值得注意的是，`DashboardSchema`只要实现妥当，并不需要设计成响应式变量，其成员变量则可以为响应式变量、函数或其他任何事物。
 
 ### 列表页
-实现一个带搜索框和分页器的列表页是随处可见的需求，因此我们非常需要一个pro-table组件。我们找到了[这个项目](https://github.com/huzhushan/vue3-pro-table/tree/master)，huzhushan大佬实现了一个简单的Vue插件，但很可惜并不能直接在vue3.2 + TS的工程中跑起来，因此我把代码复制到了自己的工程里。但这个组件有些小问题，所以我帮忙修复了一下，[传送门](https://github.com/Hans774882968/schema-ui-vue3-demo/blob/main/src/components/Vue3ProTable/Vue3ProTable.vue)。
+实现一个带搜索框和分页器的列表页是随处可见的需求，因此我们非常需要一个pro-table组件。我们找到了[这个项目](https://github.com/huzhushan/vue3-pro-table/tree/master)，huzhushan大佬实现了一个简单的Vue插件，但很可惜它并不能直接在vue3.2 + TS的工程中跑起来，因此我把代码复制到了自己的工程里。复制后发现这个组件有些小问题，所以我帮忙修复了一下，[传送门](https://github.com/Hans774882968/schema-ui-vue3-demo/blob/main/src/components/Vue3ProTable/Vue3ProTable.vue)。
 
 为了让这个组件可以直接接收schema，只需要使用`v-bind`。
 

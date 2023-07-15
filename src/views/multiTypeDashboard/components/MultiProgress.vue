@@ -18,10 +18,10 @@
 </template>
 
 <script lang="ts" setup>
-import reduce from 'lodash/reduce';
+import { Percent } from './multiProgress';
 import { PropType, computed } from 'vue';
 import { displayLocalePercent } from '../utils';
-import { Percent } from './multiProgress';
+import reduce from 'lodash/reduce';
 
 const nonLastColors = ['#3274F7', '#FFB014'];
 const lastColor = '#F5F6F9';
@@ -31,17 +31,17 @@ function getNonLastColor(i: number) {
 }
 
 const props = defineProps({
-  height: {
-    type: Number,
-    default: 4,
-  },
   borderRadius: {
-    type: Number,
     default: 4,
+    type: Number,
+  },
+  height: {
+    default: 4,
+    type: Number,
   },
   percents: {
-    type: Array as PropType<Array<Percent>>,
     default: () => [],
+    type: Array as PropType<Array<Percent>>,
   },
 });
 
@@ -64,8 +64,8 @@ const linearGradientStr = computed(() => prefixSumPercents.value.reduce((res, va
 
 const styleObject = computed(() => ({
   background: `linear-gradient(to right, ${linearGradientStr.value})`,
-  height: `${props.height || 4}px`,
   borderRadius: `${props.borderRadius || props.height}px`,
+  height: `${props.height || 4}px`,
 }));
 
 const getItemPercentStyle = (index: number) => ({

@@ -24,15 +24,15 @@
 </template>
 
 <script lang="ts" setup>
-import { QuestionFilled, ArrowRightBold } from '@element-plus/icons-vue';
+import { ArrowRightBold, QuestionFilled } from '@element-plus/icons-vue';
 import { ComputedRef, PropType, computed } from 'vue';
-import { displayLocaleNumber } from '../utils';
 import { InfoCardSchema } from './infoCardSchema';
+import { displayLocaleNumber } from '../utils';
 
 const props = defineProps({
   schema: {
-    type: Object as PropType<ComputedRef<InfoCardSchema>>,
     required: true,
+    type: Object as PropType<ComputedRef<InfoCardSchema>>,
   },
 });
 
@@ -46,8 +46,8 @@ const descriptionNumber = computed(() => {
 });
 const isDescriptionNumberStrong = computed(() => props.schema.value.description?.number?.strong || true);
 const descriptionNumberClass = computed(() => ({
-  'number-strong': isDescriptionNumberStrong,
   'description-text': !isDescriptionNumberStrong.value,
+  'number-strong': isDescriptionNumberStrong,
 }));
 const descriptionText = computed(() => props.schema.value.description?.text || '');
 const infoCardStyleObject = computed(() => props.schema.value.style || {});

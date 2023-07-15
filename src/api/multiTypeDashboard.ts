@@ -8,7 +8,19 @@ export const loadAdminOverallData = async () => {
     }, 1000);
   });
   return {
+    percent1: 10,
+    percent2: 100,
+    percent3: 20,
+    percent4: 0,
+    percent5: 0,
+    percent6: 30,
+    percentValue1: 1231,
+    percentValue2: 1232,
+    percentValue3: 1233,
     value1: 1231,
+    value10: 1240,
+    value11: 1241,
+    value12: 1242,
     value2: 1232,
     value3: 1233,
     value4: 1234,
@@ -17,18 +29,6 @@ export const loadAdminOverallData = async () => {
     value7: 1237,
     value8: 1238,
     value9: 1239,
-    value10: 1240,
-    value11: 1241,
-    value12: 1242,
-    percentValue1: 1231,
-    percentValue2: 1232,
-    percentValue3: 1233,
-    percent1: 10,
-    percent2: 100,
-    percent3: 20,
-    percent4: 0,
-    percent5: 0,
-    percent6: 30,
   };
 };
 
@@ -40,7 +40,19 @@ export const loadStationOverallData = async () => {
     }, 1000);
   });
   return {
+    percent1: 11,
+    percent2: 101,
+    percent3: 21,
+    percent4: 0,
+    percent5: 0,
+    percent6: 31,
+    percentValue1: 1241,
+    percentValue2: 1242,
+    percentValue3: 1243,
     value1: 1241,
+    value10: 1250,
+    value11: 1251,
+    value12: 1252,
     value2: 1242,
     value3: 1243,
     value4: 1244,
@@ -49,18 +61,6 @@ export const loadStationOverallData = async () => {
     value7: 1247,
     value8: 1248,
     value9: 1249,
-    value10: 1250,
-    value11: 1251,
-    value12: 1252,
-    percentValue1: 1241,
-    percentValue2: 1242,
-    percentValue3: 1243,
-    percent1: 11,
-    percent2: 101,
-    percent3: 21,
-    percent4: 0,
-    percent5: 0,
-    percent6: 31,
   };
 };
 
@@ -72,23 +72,23 @@ export const loadAgencyOverallData = async () => {
     }, 1000);
   });
   return {
-    value5: 1255,
-    value6: 1256,
-    value7: 1257,
-    value8: 1258,
-    value9: 1259,
-    value10: 1260,
-    value11: 1261,
-    value12: 1262,
-    percentValue1: 1251,
-    percentValue2: 1252,
-    percentValue3: 1253,
     percent1: 12,
     percent2: 102,
     percent3: 22,
     percent4: 0,
     percent5: 0,
     percent6: 32,
+    percentValue1: 1251,
+    percentValue2: 1252,
+    percentValue3: 1253,
+    value10: 1260,
+    value11: 1261,
+    value12: 1262,
+    value5: 1255,
+    value6: 1256,
+    value7: 1257,
+    value8: 1258,
+    value9: 1259,
   };
 };
 
@@ -97,7 +97,6 @@ const getNumberArray = ({ pageNum, pageSize, total }: { pageNum: number, pageSiz
   .filter((v) => v <= total);
 
 const adminMockDetailData = (params: { pageNum: number, pageSize: number }) => ({
-  total: 100,
   list: getNumberArray({ ...params, total: 100 })
     .map((v) => ({
       field1: `admin-f1-${v}`,
@@ -105,10 +104,10 @@ const adminMockDetailData = (params: { pageNum: number, pageSize: number }) => (
       field3: `admin-f3-${v}`,
       field4: `admin-f4-${v}`,
     })),
+  total: 100,
 });
 
 const stationMockDetailData = (params: { pageNum: number, pageSize: number }) => ({
-  total: 100,
   list: getNumberArray({ ...params, total: 100 })
     .map((v) => ({
       field1: `station-f1-${v}`,
@@ -116,10 +115,10 @@ const stationMockDetailData = (params: { pageNum: number, pageSize: number }) =>
       field5: `station-f5-${v}`,
       field6: `station-f6-${v}`,
     })),
+  total: 100,
 });
 
 const agencyMockDetailData = (params: { pageNum: number, pageSize: number }) => ({
-  total: 100,
   list: getNumberArray({ ...params, total: 100 })
     .map((v) => ({
       field3: `agency-f3-${v}`,
@@ -127,6 +126,7 @@ const agencyMockDetailData = (params: { pageNum: number, pageSize: number }) => 
       field5: `agency-f5-${v}`,
       field6: `agency-f6-${v}`,
     })),
+  total: 100,
 });
 
 export interface AdminDetailParams {
@@ -154,9 +154,9 @@ export const loadAdminDetailData = async (params: AdminDetailParams)
     }, 1500);
   });
   return {
-    retcode: 0,
-    message: '',
     data: adminMockDetailData({ pageNum: params.pageNum, pageSize: params.pageSize }),
+    message: '',
+    retcode: 0,
   };
 };
 
@@ -185,9 +185,9 @@ export const loadStationDetailData = async (params: StationDetailParams)
     }, 1500);
   });
   return {
-    retcode: 0,
-    message: '',
     data: stationMockDetailData({ pageNum: params.pageNum, pageSize: params.pageSize }),
+    message: '',
+    retcode: 0,
   };
 };
 
@@ -216,8 +216,8 @@ export const loadAgencyDetailData = async (params: AgencyDetailParams)
     }, 1500);
   });
   return {
-    retcode: 0,
-    message: '',
     data: agencyMockDetailData({ pageNum: params.pageNum, pageSize: params.pageSize }),
+    message: '',
+    retcode: 0,
   };
 };

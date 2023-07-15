@@ -41,27 +41,27 @@
 
 <script lang="ts" setup>
 import {
+  DashboardSchema,
+  PageTypes,
+  getAdminDashboardSchema,
+  getAgencyDashboardSchema,
+  getStationDashboardSchema,
+} from './useMultiTypeDashboardSchema';
+import {
   nextTick, onBeforeMount, ref, watch,
 } from 'vue';
 import { useRoute } from 'vue-router';
-import Vue3ProTable from '@/components/Vue3ProTable/Vue3ProTable.vue';
-import InfoCard from './components/InfoCard.vue';
-import {
-  getStationDashboardSchema,
-  getAgencyDashboardSchema,
-  getAdminDashboardSchema,
-  DashboardSchema,
-  PageTypes,
-} from './useMultiTypeDashboardSchema';
 import CardWithProgress from './components/CardWithProgress.vue';
+import InfoCard from './components/InfoCard.vue';
+import Vue3ProTable from '@/components/Vue3ProTable/Vue3ProTable.vue';
 
 const route = useRoute();
 
 const getMultiTypeDashboardSchema = () => {
   const schemaMap: Record<PageTypes, () => DashboardSchema> = {
     admin: getAdminDashboardSchema,
-    station: getStationDashboardSchema,
     agency: getAgencyDashboardSchema,
+    station: getStationDashboardSchema,
   };
 
   const { dashboardType } = route.params;

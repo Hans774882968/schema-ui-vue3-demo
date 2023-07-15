@@ -223,21 +223,21 @@
 
 <script>
 // modify from https://github.com/huzhushan/vue3-pro-table/tree/master
+import { RefreshRight, Search } from '@element-plus/icons-vue';
 import {
-  defineComponent, reactive, toRefs, onBeforeMount,
+  defineComponent, onBeforeMount, reactive, toRefs,
 } from 'vue';
-import { Search, RefreshRight } from '@element-plus/icons-vue';
 
 const formatDate = (date, dateFormat) => {
   let format = dateFormat;
   const obj = {
-    'M+': date.getMonth() + 1,
     'D+': date.getDate(),
     'H+': date.getHours(),
-    'm+': date.getMinutes(),
-    's+': date.getSeconds(),
-    'q+': Math.floor((date.getMonth() + 3) / 3),
+    'M+': date.getMonth() + 1,
     'S+': date.getMilliseconds(),
+    'm+': date.getMinutes(),
+    'q+': Math.floor((date.getMonth() + 3) / 3),
+    's+': date.getSeconds(),
   };
   if (/(y+)/i.test(format)) {
     format = format.replace(
@@ -287,115 +287,92 @@ const getSearchModel = (search) => {
   return searchModel;
 };
 export default defineComponent({
-  components: { Search, RefreshRight },
+  components: { RefreshRight, Search },
   props: {
+
+    blockRedundantRequestOnReset: {
+      default: false,
+      type: Boolean,
+    },
+
+    border: {
+      default: false,
+      type: Boolean,
+    },
+
+    // 表头配置
+    columns: {
+      default() {
+        return [];
+      },
+      type: Array,
+    },
+
+    // 是否隐藏标题栏
+    hideTitleBar: {
+      default: false,
+      type: Boolean,
+    },
+
+    loadTableDataBeforeMount: {
+      default: false,
+      type: Boolean,
+    },
+
+    // 分页配置，false表示不显示分页
+    pagination: {
+      default: () => ({}),
+      type: [Boolean, Object],
+    },
+
     // 请求数据的方法
     request: {
       type: Function,
     },
-    // 表格标题
-    title: {
-      type: String,
-      default: '',
-    },
-    // 是否隐藏标题栏
-    hideTitleBar: {
-      type: Boolean,
-      default: false,
-    },
-    // 搜索表单配置，false表示不显示搜索表单
-    search: {
-      type: [Boolean, Object],
-      default: false,
-    },
-    border: {
-      type: Boolean,
-      default: false,
-    },
-    // 表头配置
-    columns: {
-      type: Array,
-      default() {
-        return [];
-      },
-    },
+
     // 行数据的Key，同elementUI的table组件的row-key
     rowKey: {
-      type: String,
       default: 'id',
+      type: String,
     },
-    // 分页配置，false表示不显示分页
-    pagination: {
+
+    // 搜索表单配置，false表示不显示搜索表单
+    search: {
+      default: false,
       type: [Boolean, Object],
-      default: () => ({}),
+    },
+
+    // 表格标题
+    title: {
+      default: '',
+      type: String,
     },
     tree: {
-      type: Object,
       default: () => ({}),
-    },
-    loadTableDataBeforeMount: {
-      type: Boolean,
-      default: false,
-    },
-    blockRedundantRequestOnReset: {
-      type: Boolean,
-      default: false,
+      type: Object,
     },
   },
   setup(props, { emit }) {
     let getTableData = () => {}; // 解决eslint used before it was defined报错
 
     const state = reactive({
-      searchModel: getSearchModel(props.search),
-      loading: false,
-      tableData: [],
-      total: 0,
-      pageNum: 1,
-      pageSize: (!!props.pagination && props.pagination.pageSize) || 10,
-      paginationConfig: {
-        show: false,
-      },
-      // 搜索
-      handleSearch() {
-        state.pageNum = 1;
-        getTableData();
-      },
-      // 重置函数
-      handleReset() {
-        if (props.blockRedundantRequestOnReset && JSON.stringify(state.searchModel) === '{}') {
-          return;
-        }
-        state.pageNum = 1;
-        state.searchModel = getSearchModel(props.search);
-        getTableData();
-      },
-      // 刷新
-      refresh() {
-        getTableData();
+
+      // 过滤方法
+      filterHandler(value, row, column) {
+        const { property } = column;
+        return row[property] === value;
       },
 
       // 当前页变化
       handleCurrentChange() {
         getTableData();
       },
-      // 改变每页size数量
-      handleSizeChange() {
-        state.pageNum = 1;
-        getTableData();
-      },
-      // 全选
-      handleSelectionChange(arr) {
-        emit('selectionChange', arr);
-      },
-      // 过滤方法
-      filterHandler(value, row, column) {
-        const { property } = column;
-        return row[property] === value;
-      },
+
       // 日期范围
       handleDateChange(date, item, format) {
         state.searchModel[item.name] = date ? formatDate(date, format) : '';
       },
+
       handleRangeChange(date, item, format) {
         const arr = !!date && date.map((d) => formatDate(d, format));
         state.searchModel[item.name] = arr || [];
@@ -414,6 +391,54 @@ export default defineComponent({
           });
         }
       },
+
+      // 重置函数
+      handleReset() {
+        if (props.blockRedundantRequestOnReset && JSON.stringify(state.searchModel) === '{}') {
+          return;
+        }
+        state.pageNum = 1;
+        state.searchModel = getSearchModel(props.search);
+        getTableData();
+      },
+
+      // 搜索
+      handleSearch() {
+        state.pageNum = 1;
+        getTableData();
+      },
+
+      // 全选
+      handleSelectionChange(arr) {
+        emit('selectionChange', arr);
+      },
+
+      // 改变每页size数量
+      handleSizeChange() {
+        state.pageNum = 1;
+        getTableData();
+      },
+
+      loading: false,
+
+      pageNum: 1,
+
+      pageSize: (!!props.pagination && props.pagination.pageSize) || 10,
+
+      paginationConfig: {
+        show: false,
+      },
+
+      // 刷新
+      refresh() {
+        getTableData();
+      },
+
+      searchModel: getSearchModel(props.search),
+
+      tableData: [],
+
+      total: 0,
     });
 
     // 优化搜索字段，
@@ -462,9 +487,9 @@ export default defineComponent({
 
     if (typeof props.pagination === 'object') {
       state.paginationConfig = {
-        show: true,
         layout: props.pagination.layout || 'total, sizes, prev, pager, next, jumper',
         pageSizes: props.pagination.pageSizes || [10, 20, 30, 40, 50, 100],
+        show: true,
         style: props.pagination.style || {},
       };
     }

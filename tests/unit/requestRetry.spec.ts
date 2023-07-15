@@ -13,8 +13,8 @@ describe('src/views/multiTypeDashboard/requestRetry.ts', () => {
         ans.push(20);
       };
       await retryable(action, {
-        beforeRequest: () => ans.push(10),
         afterRequest: () => ans.push(30),
+        beforeRequest: () => ans.push(10),
       });
       ans.push(40);
     };
@@ -32,8 +32,8 @@ describe('src/views/multiTypeDashboard/requestRetry.ts', () => {
         ans.push(30);
       };
       retryable(action, {
-        beforeRequest: () => ans.push(10),
         afterRequest: () => ans.push(40),
+        beforeRequest: () => ans.push(10),
       });
       ans.push(20);
     };
@@ -56,8 +56,8 @@ describe('src/views/multiTypeDashboard/requestRetry.ts', () => {
         ans.push(30);
       };
       const wrappedAction = await retryable(action, {
-        beforeRequest: () => ans.push(20),
         afterRequest: () => ans.push(40),
+        beforeRequest: () => ans.push(20),
         delay: true,
       });
       ans.push(10);

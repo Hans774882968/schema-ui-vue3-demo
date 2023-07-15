@@ -33,17 +33,17 @@ async function innerRetryable(tryCount: number, action: () => unknown, options: 
 }
 
 export default async function retryable(action: () => unknown, options: RetryOption = {
-  errorMsg: '', delay: false, beforeRequest: () => {}, afterRequest: () => {},
+  afterRequest: () => {}, beforeRequest: () => {}, delay: false, errorMsg: '',
 }) {
   const {
     errorMsg, customErrorHandler, delay, beforeRequest, afterRequest,
   } = options;
   const parsedOptions = {
-    errorMsg: errorMsg || '',
+    afterRequest: afterRequest || (() => {}),
+    beforeRequest: beforeRequest || (() => {}),
     customErrorHandler: customErrorHandler || (() => {}),
     delay: delay || false,
-    beforeRequest: beforeRequest || (() => {}),
-    afterRequest: afterRequest || (() => {}),
+    errorMsg: errorMsg || '',
   };
   if (delay) return () => innerRetryable(0, action, parsedOptions);
   return innerRetryable(0, action, parsedOptions);

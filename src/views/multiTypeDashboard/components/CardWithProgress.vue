@@ -20,25 +20,25 @@
 
 <script lang="ts" setup>
 import { ComputedRef, PropType, computed } from 'vue';
+import { InfoCardSchema } from './infoCardSchema';
+import { ProgressSchema } from './cardWithProgressSchema';
 import { QuestionFilled } from '@element-plus/icons-vue';
 import { displayLocaleNumber, isNotNANNumber } from '../utils';
-import { InfoCardSchema } from './infoCardSchema';
 import InfoCard from './InfoCard.vue';
 import MultiProgress from './MultiProgress.vue';
-import { ProgressSchema } from './cardWithProgressSchema';
 
 const props = defineProps({
-  style: {
-    type: Object as PropType<Record<string, string>>,
-    default: () => ({}),
-  },
   infoCardSchema: {
-    type: Object as PropType<ComputedRef<InfoCardSchema>>,
     required: true,
+    type: Object as PropType<ComputedRef<InfoCardSchema>>,
   },
   progressSchema: {
-    type: Object as PropType<ComputedRef<ProgressSchema>>,
     required: true,
+    type: Object as PropType<ComputedRef<ProgressSchema>>,
+  },
+  style: {
+    default: () => ({}),
+    type: Object as PropType<Record<string, string>>,
   },
 });
 

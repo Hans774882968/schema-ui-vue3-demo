@@ -84,7 +84,7 @@ const detailTable = ref(null);
 
 type loadTypes = 'init' | 'routeChange' | 'autoRefresh';
 
-const loadWholePage = ({ loadType }: {loadType: loadTypes}) => {
+const loadWholePage = ({ loadType }: { loadType: loadTypes }) => {
   loadOverallData();
   if (loadType === 'init') {
     nextTick(() => {

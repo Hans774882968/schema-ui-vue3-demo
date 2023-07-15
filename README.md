@@ -102,13 +102,15 @@ export interface InfoCardSchema {
 3. 上述问题3是技术栈迁移的需要。对于一个代码量巨大的历史组件，我们分两步走：先改造成schema，再改造为另一个技术栈的组件。这就比直接改造为另一个技术栈的组件的风险更小，在降本增效的今天，控制风险可能成为你技术方案的一个亮点……
 
 缺点：
-1. 学习曲线更陡峭，初次实现成本更高。
+1. 学习曲线更陡峭，需求初次实现成本更高。
 2. 对于上述问题2，为了实现跨需求复用，前端同学们需要反复对齐协议，沟通成本大大升高了。
 
 ## 这个demo实现了什么
 [My GitHub](https://github.com/Hans774882968/schema-ui-vue3-demo)
 
-需求描述：假设有3种类型的看板，随意起名为`admin station agency`。它们的UI骨架都是下面的卡片：
+需求描述：假设有3种类型的看板，随意起名为`admin station agency`。它们的UI骨架有：
+
+1、若干张下面的卡片：
 
 ```js
 // (?) 表示tooltip， (number) 表示描述文本中大号加粗的数字
@@ -118,12 +120,37 @@ export interface InfoCardSchema {
 ------------------------------------
 ```
 
-但上面各个组分的展示逻辑大不相同。另外，看板类型有两种情况：
+2、一个带搜索框和分页器的标准列表页。
+
+上面各个组分的UI骨架类似，但展示逻辑大不相同。
+
+另外，看板类型在组件的生命周期中有两种情况：
 1. 不会变。比如只需要通过域名上的信息来区分要渲染的看板类型。
-2. 看板类型是路由的一个参数。
+2. 会变化。比如看板类型是路由的一个参数。
 
-情况1很简单，所以这个demo展示了情况2的处理。
+情况1很简单，所以这个demo展示了情况2的处理，见下文《路由参数变化时重新获取schema》一节。
 
+### 本demo的公共设施
+因为只是一个展示UI schema思想的简单demo，所以API请求只是简单模拟了一下。返回值类型定义：
+
+```ts
+export type CommonResp<T> = {
+  retcode: number,
+  message: string,
+  data: T
+}
+
+export type CommonTableResp<T> = CommonResp<{
+  list: T,
+  total: number
+}>
+
+// 返回值类型定义示例 Promise<CommonTableResp<StationDetailResp>>
+```
+
+[模拟API请求的代码传送门](https://github.com/Hans774882968/schema-ui-vue3-demo/blob/main/src/api/multiTypeDashboard.ts)
+
+### 卡片
 我们可以设计这样的schema（`src/views/multiTypeDashboard/useMultiTypeDashboardSchema.ts`）：
 
 ```ts
@@ -249,6 +276,117 @@ watch(
 
 值得注意的是，`DashboardSchema`只要实现妥当，并不需要设计成响应式变量，其成员变量则可以为响应式变量、函数或其他任何事物。
 
+### 列表页
+实现一个带搜索框和分页器的列表页是随处可见的需求，因此我们非常需要一个pro-table组件。我们找到了[这个项目](https://github.com/huzhushan/vue3-pro-table/tree/master)，huzhushan大佬实现了一个简单的Vue插件，但很可惜并不能直接在vue3.2 + TS的工程中跑起来，因此我把代码复制到了自己的工程里。但这个组件有些小问题，所以我帮忙修复了一下，[传送门](https://github.com/Hans774882968/schema-ui-vue3-demo/blob/main/src/components/Vue3ProTable/Vue3ProTable.vue)。
+
+为了让这个组件可以直接接收schema，只需要使用`v-bind`。
+
+```vue
+<vue3-pro-table ref="detailTable" v-bind="detailTableProps">
+  <template v-if="typeof onClickView === 'function'" #operate="scope">
+    <el-button type="text" @click="onClickView(scope.row)">View</el-button>
+  </template>
+</vue3-pro-table>
+```
+
+返回的schema示例：
+
+```ts
+export interface DashboardSchema {
+  // ...
+  detailTableProps: Vue3ProTable // import { Vue3ProTable } from '@/components/Vue3ProTable/interface';
+  onClickView?: (row: any) => unknown
+}
+// agency dashboard
+const detailTableProps = {
+  columns: [
+    { label: 'agency字段3', prop: 'field3' },
+    { label: 'agency字段4', prop: 'field4' },
+    { label: 'agency字段5', prop: 'field5' },
+    { label: 'agency字段6', prop: 'field6' },
+    {
+      fixed: 'right',
+      label: '操作',
+      tdSlot: 'operate',
+      width: 180, // 自定义单元格内容的插槽名称
+    },
+  ],
+  pagination: {
+    pageSizes: [10, 24, 40, 50, 100],
+  },
+  request: async (params: AgencyDetailParams) => {
+    console.log('agency params', params); // dbg
+    let res = { list: [] as AgencyDetailResp, total: 0 };
+    const action = async () => {
+      const { data } = await loadAgencyDetailData(params);
+      res = { list: data.list, total: data.total };
+    };
+    await retryable(action, {
+      customErrorHandler: (e: unknown) => { ElMessage.error('agency detail加载失败'); console.error('loadAgencyDetailData error', e); },
+    });
+    return {
+      data: res.list,
+      total: res.total,
+    };
+  },
+  search: {
+    fields: [
+      {
+        label: 'agency字段3',
+        name: 'field3',
+        type: 'text',
+      },
+      {
+        label: 'agency字段4',
+        name: 'field4',
+        type: 'text',
+      },
+      {
+        label: 'agency字段5',
+        name: 'field5',
+        type: 'text',
+      },
+      {
+        label: 'agency字段6',
+        name: 'field6',
+        type: 'text',
+      },
+    ],
+  },
+};
+
+interface AgencyTableItem {
+  field3: string
+  field4: string
+  field5: string
+  field6: string
+}
+const onClickView = (row: AgencyTableItem) => {
+  ElMessage(`模拟查看${row.field3}详情`);
+};
+```
+
+易踩坑点：如果你需要在修改作为子组件`props`的参数后，立即调用内部使用到`props`的方法。比如：在切换route时`detailTableProps`会变化，并且此时需要立即调用`handleReset`刷新列表。那么需要等到下一次渲染，`props`才会变为最新，即你需要使用`nextTick`。
+
+```ts
+type loadTypes = 'init' | 'routeChange' | 'autoRefresh';
+
+const loadWholePage = ({ loadType }: { loadType: loadTypes }) => {
+  loadOverallData();
+  if (loadType === 'init') {
+    nextTick(() => {
+      detailTable.value && (detailTable.value as any).refresh();
+    });
+    return;
+  }
+  if (loadType === 'routeChange') {
+    nextTick(() => {
+      detailTable.value && (detailTable.value as any).handleReset();
+    });
+  }
+};
+```
+
 ## requestRetry：重试请求能力
 虽然跟主题没关系但毕竟也是我在做B端需求的过程中沉淀出来的，因此还是简单记录一下。思路很简单：
 1. 递归。
@@ -309,7 +447,7 @@ export default async function retryable(action: () => unknown, options: RetryOpt
 }
 ```
 
-单测传送门：`tests/unit/requestRetry.spec.ts`。测试用例保证了请求前后代码的执行顺序符合预期。
+[单测传送门：`tests/unit/requestRetry.spec.ts`](https://github.com/Hans774882968/schema-ui-vue3-demo/blob/main/tests/unit/requestRetry.spec.ts)。测试用例保证了请求前后代码的执行顺序符合预期。
 
 ## 参考资料
 1. 声明式 UI 介绍：https://flutter.cn/docs/get-started/flutter-for/declarative

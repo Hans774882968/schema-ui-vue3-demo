@@ -8776,10 +8776,10 @@ vue-template-es2015-compiler@^1.9.0:
   resolved "https://registry.yarnpkg.com/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.9.1.tgz#1ee3bc9a16ecbf5118be334bb15f9c46f82f5825"
   integrity sha512-4gDntzrifFnCEvyoO8PqyJDmguXgVPxKiIxrBKjIowvL9l+N66196+72XVYR8BBf1Uv1Fgt3bGevJ+sEmxfZzw==
 
-vue3-el-pro-table@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/vue3-el-pro-table/-/vue3-el-pro-table-0.1.2.tgz#7ef818d2da42c8632974b466b2d2d69459ea2494"
-  integrity sha512-6kcIsYX8m80iv1ipfqRsilV69hxygBguirOyUoNvOmr3AQDm01LpUygxtSyREz97VqfJmhjemSjeAR0rInLdeQ==
+vue3-el-pro-table@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/vue3-el-pro-table/-/vue3-el-pro-table-0.1.3.tgz#0dbb2c0eef341c6a6497d3eddfc9b06a39a6b852"
+  integrity sha512-70XTEN2eVXN7Kjj+20bJSlNYso31MwjWb/I4zwcPggIuIY/hNdIqAKC6RkYIA8a6EzovywU8pjRTOrx7IPIlIA==
   dependencies:
     "@element-plus/icons-vue" "^2.1.0"
     core-js "^3.8.3"

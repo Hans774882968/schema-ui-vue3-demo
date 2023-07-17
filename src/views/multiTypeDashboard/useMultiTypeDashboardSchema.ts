@@ -18,7 +18,7 @@ import {
 import { ElMessage } from 'element-plus';
 import { InfoCardSchema } from './components/infoCardSchema';
 import { ProgressSchema } from './components/cardWithProgressSchema';
-import { Vue3ProTable } from '@/components/Vue3ProTable/interface';
+import { Vue3ProTableProps } from 'vue3-el-pro-table';
 import { displayLocaleNumber } from './utils';
 import retryable from './requestRetry';
 
@@ -106,7 +106,7 @@ export interface DashboardSchema {
   cardWithProgressSchema1: CardWithProgressSchema
   cardWithProgressSchema2: CardWithProgressSchema
   cardWithProgressSchema3: CardWithProgressSchema
-  detailTableProps: Vue3ProTable
+  detailTableProps: Vue3ProTableProps
   onClickView?: (row: any) => unknown
 }
 

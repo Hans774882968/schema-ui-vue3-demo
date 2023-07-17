@@ -3909,6 +3909,27 @@ element-plus@^2.3.7:
     memoize-one "^6.0.0"
     normalize-wheel-es "^1.2.0"
 
+element-plus@^2.3.8:
+  version "2.3.8"
+  resolved "https://registry.npmmirror.com/element-plus/-/element-plus-2.3.8.tgz#46032abe1a712abfb65932f146ee19281312a9cf"
+  integrity sha512-yHQR0/tG2LvPkpGUt7Te/hPmP2XW/BytBNUbx+EFO54VnGCOE3upmQcVffNp1PLgwg9sthYDXontUWpnpmLPJw==
+  dependencies:
+    "@ctrl/tinycolor" "^3.4.1"
+    "@element-plus/icons-vue" "^2.0.6"
+    "@floating-ui/dom" "^1.0.1"
+    "@popperjs/core" "npm:@sxzz/popperjs-es@^2.11.7"
+    "@types/lodash" "^4.14.182"
+    "@types/lodash-es" "^4.17.6"
+    "@vueuse/core" "^9.1.0"
+    async-validator "^4.2.5"
+    dayjs "^1.11.3"
+    escape-html "^1.0.3"
+    lodash "^4.17.21"
+    lodash-es "^4.17.21"
+    lodash-unified "^1.0.2"
+    memoize-one "^6.0.0"
+    normalize-wheel-es "^1.2.0"
+
 emittery@^0.10.2:
   version "0.10.2"
   resolved "https://registry.yarnpkg.com/emittery/-/emittery-0.10.2.tgz#902eec8aedb8c41938c46e9385e9db7e03182933"
@@ -8754,6 +8775,16 @@ vue-template-es2015-compiler@^1.9.0:
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.9.1.tgz#1ee3bc9a16ecbf5118be334bb15f9c46f82f5825"
   integrity sha512-4gDntzrifFnCEvyoO8PqyJDmguXgVPxKiIxrBKjIowvL9l+N66196+72XVYR8BBf1Uv1Fgt3bGevJ+sEmxfZzw==
+
+vue3-el-pro-table@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/vue3-el-pro-table/-/vue3-el-pro-table-0.1.2.tgz#7ef818d2da42c8632974b466b2d2d69459ea2494"
+  integrity sha512-6kcIsYX8m80iv1ipfqRsilV69hxygBguirOyUoNvOmr3AQDm01LpUygxtSyREz97VqfJmhjemSjeAR0rInLdeQ==
+  dependencies:
+    "@element-plus/icons-vue" "^2.1.0"
+    core-js "^3.8.3"
+    element-plus "^2.3.8"
+    vue "^3.2.13"
 
 vue@^3.2.13:
   version "3.3.4"

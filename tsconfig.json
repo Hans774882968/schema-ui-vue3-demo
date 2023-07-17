@@ -14,7 +14,9 @@
     "baseUrl": ".",
     "types": [
       "webpack-env",
-      "jest"
+      "jest",
+      "vue3-el-pro-table/dist/global.d.ts",
+      "element-plus/global.d.ts"
     ],
     "paths": {
       "@/*": [

@@ -30,9 +30,16 @@
     </div>
 
     <div>
-      <vue3-pro-table ref="detailTable" v-bind="detailTableProps">
+      <!-- 使用 v-bind 会报类型错误 -->
+      <vue3-pro-table
+        ref="detailTable"
+        :columns="detailTableProps.columns"
+        :pagination="detailTableProps.pagination"
+        :request="detailTableProps.request"
+        :search="detailTableProps.search"
+      >
         <template v-if="typeof onClickView === 'function'" #operate="scope">
-          <el-button type="text" @click="onClickView(scope.row)">View</el-button>
+          <el-link :underline="false" @click="onClickView(scope.row)">View</el-link>
         </template>
       </vue3-pro-table>
     </div>
@@ -53,7 +60,6 @@ import {
 import { useRoute } from 'vue-router';
 import CardWithProgress from './components/CardWithProgress.vue';
 import InfoCard from './components/InfoCard.vue';
-import Vue3ProTable from '@/components/Vue3ProTable/Vue3ProTable.vue';
 
 const route = useRoute();
 
